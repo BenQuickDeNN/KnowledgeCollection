@@ -572,4 +572,121 @@ for (auto iter = a.begin(); iter != a.end(); ++iter)
 ```
 删除后当前迭代器会失效，通过iter=iter+1使迭代器指向下一个元素。
 
+### unordered_map
+#### 底层数据结构
+哈希表
+
+#### 接口
+与map相似
+
+#### 与map比较
+优点：哈希表查找时间复杂度是常量级，红黑树查找时间复杂度是logN。
+
+缺点：无序，对于某些需要按序存储的情形，map更胜任。
+
+### vector
+#### emplace_back()
+类似于push_back函数，但不同，在vector后方创建一个与参数相同的元素，而push_back是将参数的引用推入后方。
+
+### copy()
+#### 头文件
+```c++
+#include <vector>
+```
+#### 在两个容器之间复制元素
+```c++
+copy(源首地址, 源末地址, 目标首地址);
+```
+
+## C++11新特性
+### 智能指针
+#### 基本特性
+* 智能指针利用了一种叫做RAII（资源获取即初始化）的技术对普通的指针进行封装，这使得智能指针实质上是一个对象，行为表现的却像一个指针。
+* 智能指针的作用是防止忘记调用delete释放内存和程序异常的计入catch块忘记释放内存。另外指针释放时机也非常有考究。
+
+#### unique_ptr\<T>
+##### 分配内存
+与shared_ptr不同，C++11标准中unique_ptr没有定义类似make_shared的操作（C++14中有make_unique\<T>()），因此只可以使用new来分配内存，并且由于unique_ptr不可拷贝和赋值，初始化unique_ptr必须使用直接初始化的方式。
+```c++
+unique_ptr<int> up1(new int());    //okay,直接初始化
+unique_ptr<int> up2 = new int();   //error! 构造函数是explicit
+unique_ptr<int> up3(up1);          //error! 不允许拷贝
+```
+
+##### 销毁指向的对象
+在析构函数中销毁。
+
+##### 接口
+```c++
+unique_ptr<T> up; // 空的unique_ptr，可以指向类型为T的对象，默认使用delete来释放内存
+unique_ptr<T,D> up(d); // 空的unique_ptr同上，接受一个D类型的删除器d，使用删除器d来释放内存
+up = nullptr; // 释放up指向的对象，将up置为空
+up.release(); // up放弃对它所指对象的控制权，并返回保存的指针，将up置为空，不会释放内存
+up.reset(…); // 参数可以为 空、内置指针，先将up所指对象释放，然后重置up的值.
+```
+
+##### 传值
+一个unique_ptr将指向的内容传递给另一个unique_ptr对象：
+```c++
+unique_ptr<int> p1 = make_unique<int>();
+unique_ptr<int> p2 = std::move(p1);
+```
+
+#### shared_ptr\<T>
+共享计数指针。
+
+##### 作用
+多线程程序经常会遇到在某个线程A创建了一个对象,这个对象需要在线程B使用，在没有shared_ptr时,因为线程A,B结束时间不确定,即在A或B线程先释放这个对象都有可能造成另一个线程崩溃，所以为了省时间一般都是任由这个内存泄漏发生。当然也可以经过复杂的设计，由一个监控线程来统一删除，但这样会增加代码量和复杂度.这下好了,shared_ptr 可以方便的解决问题,因为它是引用计数和线程安全的。shared_ptr不用手动去释放资源，它会智能地在合适的时候去自动释放。
+
+##### 原理
+当多个shared_ptr管理同一个指针，仅当最后一个shared_ptr析构时，指针才被delete。这是怎么实现的呢？答案是：引用计数（reference counting）。引用计数指的是，所有管理同一个裸指针（raw pointer）的shared_ptr，都共享一个引用计数器，每当一个shared_ptr被赋值（或拷贝构造）给其它shared_ptr时，这个共享的引用计数器就加1，当一个shared_ptr析构或者被用于管理其它裸指针时，这个引用计数器就减1，如果此时发现引用计数器为0，那么说明它是管理这个指针的最后一个shared_ptr了，于是我们释放指针指向的资源。
+
+### 参数包
+详见[CppRef](https://en.cppreference.com/w/cpp/language/parameter_pack)。
+
+A template parameter pack is a template parameter that accepts zero or more template arguments (non-types, types, or templates). A function parameter pack is a function parameter that accepts zero or more function arguments. A template with at least one parameter pack is called a variadic template (可变模板)。
+
+### std::conditional
+#### 用法
+```c++
+#include <type_traits>
+template< bool B, class T, class F >
+struct conditional;
+```
+type T if B==true, F if B==false
+
+#### 示例
+```c++
+#include <iostream>
+#include <type_traits>
+#include <typeinfo>
+int main() 
+{
+    typedef std::conditional<true, int, double>::type Type1;
+    typedef std::conditional<false, int, double>::type Type2;
+    typedef std::conditional<sizeof(int) >= sizeof(double), int, double>::type Type3;
+ 
+    std::cout << typeid(Type1).name() << '\n';
+    std::cout << typeid(Type2).name() << '\n';
+    std::cout << typeid(Type3).name() << '\n';
+}
+```
+上述代码的输出：
+```
+i
+d
+d
+```
+
+### default constructors
+详见[CppRef](https://en.cppreference.com/w/cpp/language/default_constructor)
+
+A default constructor is a constructor which can be called with no arguments (either defined with an empty parameter list, or with default arguments provided for every parameter). A type with a public default constructor is DefaultConstructible.
+
 # 高性能计算
+## 并行数值算法
+
+## 并行程序设计
+### 脉动阵列（systolic array）
+
+# 数据结构与算法
