@@ -313,8 +313,7 @@ void *malloc(size_t size)
     return block;
 }
 ```
-其中，void*是一个特殊的指针，其值为0。
-
+其中，void*是一个特殊的指针，其值为0。\
 如果想释放一块malloc申请的内存，我们需要知道这块内存的首地址、该内存块的大小、该内存块是否被标记为free，我们把记录以上这些数据的结构体叫作**header_t**。
 ```c
 struct header_t
@@ -323,8 +322,7 @@ struct header_t
     unsigned is_free;   // 当前内存块是否已被标记为free
 };
 ```
-特别地，若当前进程申请的内存不连续（比如其他进程在当前进程运行期间调用sbrk申请了内存），则还需要维护一个header_t链表。
-
+特别地，若当前进程申请的内存不连续（比如其他进程在当前进程运行期间调用sbrk申请了内存），则还需要维护一个header_t链表。\
 ![header_t链表](image/header_t_linked_list.jpg)
 ```c
 struct header_t
@@ -443,8 +441,7 @@ view_t& array_view_;
 ```
 
 ### 类和结构体所占内存大小
-类所占内存的大小是由成员变量（static修饰的静态变量除外）决定的，成员函数是不计算在内的。
-
+类所占内存的大小是由成员变量（static修饰的静态变量除外）决定的，成员函数是不计算在内的。\
 举两个栗子：
 
 #### 例1
@@ -580,8 +577,7 @@ for (auto iter = a.begin(); iter != a.end(); ++iter)
 与map相似
 
 #### 与map比较
-优点：哈希表查找时间复杂度是常量级，红黑树查找时间复杂度是logN。
-
+优点：哈希表查找时间复杂度是常量级，红黑树查找时间复杂度是logN。\
 缺点：无序，对于某些需要按序存储的情形，map更胜任。
 
 ### vector
@@ -642,8 +638,7 @@ unique_ptr<int> p2 = std::move(p1);
 当多个shared_ptr管理同一个指针，仅当最后一个shared_ptr析构时，指针才被delete。这是怎么实现的呢？答案是：引用计数（reference counting）。引用计数指的是，所有管理同一个裸指针（raw pointer）的shared_ptr，都共享一个引用计数器，每当一个shared_ptr被赋值（或拷贝构造）给其它shared_ptr时，这个共享的引用计数器就加1，当一个shared_ptr析构或者被用于管理其它裸指针时，这个引用计数器就减1，如果此时发现引用计数器为0，那么说明它是管理这个指针的最后一个shared_ptr了，于是我们释放指针指向的资源。
 
 ### 参数包
-详见[CppRef](https://en.cppreference.com/w/cpp/language/parameter_pack)。
-
+详见[CppRef](https://en.cppreference.com/w/cpp/language/parameter_pack)。\
 A template parameter pack is a template parameter that accepts zero or more template arguments (non-types, types, or templates). A function parameter pack is a function parameter that accepts zero or more function arguments. A template with at least one parameter pack is called a variadic template (可变模板)。
 
 ### std::conditional
@@ -679,8 +674,7 @@ d
 ```
 
 ### default constructors
-详见[CppRef](https://en.cppreference.com/w/cpp/language/default_constructor)
-
+详见[CppRef](https://en.cppreference.com/w/cpp/language/default_constructor)\
 A default constructor is a constructor which can be called with no arguments (either defined with an empty parameter list, or with default arguments provided for every parameter). A type with a public default constructor is DefaultConstructible.
 
 # 高性能计算
@@ -690,3 +684,117 @@ A default constructor is a constructor which can be called with no arguments (ei
 ### 脉动阵列（systolic array）
 
 # 数据结构与算法
+## 搜索算法
+### 深度优先搜索（DFS）
+具有回溯能力，适合少量长结果搜索，可通过栈或递归实现，借助栈确定搜索顺序。
+
+### 广度优先搜索（BFS）
+适合大量短结果搜索，可通过队列实现，借助队列确定搜索顺序。
+
+## 排序算法
+### 排序算法的稳定性
+设有一数组a，在经过排序后，原数组a中任意两个值相等的元素顺序不变，则该排序算法是稳定的，否则不稳定。
+
+### 快速排序
+时间复杂度为NlogN。\
+示例代码：
+```c++
+#include <vector>
+#include <cstdlib>
+#include <iostream>
+#include <algorithm>
+using namespace std;
+void qsort(vector<int>& arr, const int& low, const int& high)
+{
+    if (low >= high) return;
+    int i = low;
+    int j = high + 1;
+    int key = arr[low];
+    while (true)
+    {
+        /* 从左向右找比key大的值 */
+        while (arr[++i] <= key)
+            if (i == high) break;
+        /* 从右向左找比key小的值 */
+        while (arr[--j] >= key)
+            if (j == low) break;
+        if (i >= j) break;
+        swap(arr[i], arr[j]);
+    }
+    /* 替换中枢值 */
+    swap(arr[low], arr[j]);
+    /* 如此一来，中枢左边的值都比中枢右边的小 */
+    qsort(arr, low, j - 1);
+    qsort(arr, j + 1, high);
+}
+int main()
+{
+    vector<int> arr = {5, 3, 7, 6, 4, 1, 0, 2, 9, 10, 8};
+    /* 快速排序 */
+    qsort(arr, 0, arr.size() - 1);
+    for (const int& ele : arr)
+        cout << ele << ' ';
+    cout << endl;
+    return 0;
+}
+```
+快速排序与归并排序的思路是相反的。
+
+### 堆排序
+如果要进行升序排序，那么先建立大顶堆，然后把堆顶元素与堆尾元素交换。时间复杂度为NlogN。
+
+示例代码：
+```c++
+#include <vector>
+#include <algorithm>
+#include <iostream>
+#include <cstdlib>
+using namespace std;
+inline int left(const int& i) { return 2 * i + 1; }
+inline int right(const int& i) { return 2 * i + 2; }
+void heapSort(vector<int>& arr, const int& i, const int& tail)
+{
+    if (i < 0 || i > tail)
+        return;
+    int l = left(i), r = right(i);
+    if (r < tail && arr[i] < arr[r])
+    {
+        swap(arr[i], arr[r]);
+        heapSort(arr, r, tail);
+    }
+    else if (l < tail && arr[i] < arr[l])
+    {
+        swap(arr[i], arr[l]);
+        heapSort(arr, l, tail);
+    }
+    heapSort(arr, i - 1, tail);
+}
+int main()
+{
+    vector<int> arr;// = {4, 6, 8, 5, 9};
+    while (arr.size() < 20)
+        arr.emplace_back(rand());
+    /* 做一个大顶堆 */
+    int tmpI = arr.size() / 2 - 1;
+    heapSort(arr, tmpI, arr.size());
+    for (const int& ele : arr)
+        cout << ele << " ";
+    cout << endl;
+    /* 调整堆结构 */
+    for (int tail = arr.size() - 1; tail > 0; tail--)
+    {
+        if (arr[0] > arr[tail])
+            swap(arr[0], arr[tail]);
+        heapSort(arr, 0, tail);
+    }
+    for (const int& ele : arr)
+        cout << ele << " ";
+    cout << endl;
+    return 0;
+}
+```
+
+### 字典树（Trie树）
+又称“前缀树”、“Trie树”，是一种哈希树的变种。典型应用是用于统计，排序和保存大量的字符串（但不仅限于字符串），所以经常被搜索引擎系统用于文本词频统计。它的优点是：利用字符串的公共前缀来减少查询时间，最大限度地减少无谓的字符串比较，查询效率比哈希树高。
+
+# 操作系统
