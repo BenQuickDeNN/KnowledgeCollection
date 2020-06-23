@@ -681,6 +681,16 @@ A default constructor is a constructor which can be called with no arguments (ei
 ## 并行数值算法
 
 ## 并行程序设计
+
+## CUDA
+### 锁页内存
+host端存在虚拟内存。**锁页内存**就是分配host端内存时锁定该页，让其不与磁盘（虚拟内存）交换。
+
+#### 使用锁页内存的好处
+* 设备内存与锁页内存之间的数据传输可以与内核执行并行处理。
+* 锁页内存可以映射到设备内存，减少设备与主机的数据传输。
+* 在前端总线的主机系统锁页内存与设备内存之间的数据交换会比较快；并且可以是write-combining的，此时带宽会跟大。
+
 ### 脉动阵列（systolic array）
 
 # 数据结构与算法
