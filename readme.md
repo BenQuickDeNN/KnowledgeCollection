@@ -691,6 +691,18 @@ host端存在虚拟内存。**锁页内存**就是分配host端内存时锁定�
 * 锁页内存可以映射到设备内存，减少设备与主机的数据传输。
 * 在前端总线的主机系统锁页内存与设备内存之间的数据交换会比较快；并且可以是write-combining的，此时带宽会跟大。
 
+#### 锁页内存分配与释放
+CUDA提供了锁页内存分配与释放的接口：
+```c++
+cudaError_t cudaHostAlloc(void **host_pointer, size_t size, unsigned int flags); // 分配内存
+cudaError_t cudaFreeHost(void **host_pointer); // 释放内存
+```
+其中flags有如下标志：
+* cudaHostAllocDefault：指定默认行为。
+* cudaHostAllocWriteCombined：用于只被传输到设备的内存区域。当主机要从这块内存区域**读取时不要使用这个标志**。它在主机处理器上关闭了内存区域的缓存，这意味着在传输时它完全忽略了内存区域。这在特定的硬件配置上能够加速到设备的传输。
+* cudaHostAllocPortable：锁页内存在所有CUDA上下文中变成锁页的和可见的。默认情况下，内存分配属于创建它的上下文。如果你打算在CUDA上下文之间或主机处理器的线程之间传递指针，则必须使用这个标志。
+* cudaHostAllocMapped：将主机内存分配到设备内存空间，这允许GPU内核直接读取和写入，所有的传输将隐式地处理。
+
 ### 脉动阵列（systolic array）
 
 # 数据结构与算法
