@@ -703,6 +703,9 @@ cudaError_t cudaFreeHost(void **host_pointer); // 释放内存
 * cudaHostAllocPortable：锁页内存在所有CUDA上下文中变成锁页的和可见的。默认情况下，内存分配属于创建它的上下文。如果你打算在CUDA上下文之间或主机处理器的线程之间传递指针，则必须使用这个标志。
 * cudaHostAllocMapped：将主机内存分配到设备内存空间，这允许GPU内核直接读取和写入，所有的传输将隐式地处理。
 
+### 线程内存模式
+线程布局会影响SM内cache的命中率。
+
 ### 脉动阵列（systolic array）
 
 # 数据结构与算法
