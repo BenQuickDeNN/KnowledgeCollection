@@ -580,6 +580,13 @@ for (auto iter = a.begin(); iter != a.end(); ++iter)
 优点：哈希表查找时间复杂度是常量级，红黑树查找时间复杂度是logN。\
 缺点：无序，对于某些需要按序存储的情形，map更胜任。
 
+#### load_factor
+详见 http://www.cplusplus.com/reference/unordered_map/unordered_map/max_load_factor/ \
+加载因子\
+The load factor influences the probability of collision in the hash table (i.e., the probability of two elements being located in the same bucket). The container uses the value of max_load_factor as the threshold that forces an increase in the number of buckets (and thus causing a rehash).
+
+Note though, that implementations may impose an upper limit on the number of buckets (see max_bucket_count), which may force the container to ignore the max_load_factor.
+
 ### vector
 #### emplace_back()
 类似于push_back函数，但不同，在vector后方创建一个与参数相同的元素，而push_back是将参数的引用推入后方。
