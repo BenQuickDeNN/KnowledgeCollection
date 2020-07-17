@@ -840,6 +840,24 @@ int main()
 ### 字典树（Trie树）
 又称“前缀树”、“Trie树”，是一种哈希树的变种。典型应用是用于统计，排序和保存大量的字符串（但不仅限于字符串），所以经常被搜索引擎系统用于文本词频统计。它的优点是：利用字符串的公共前缀来减少查询时间，最大限度地减少无谓的字符串比较，查询效率比哈希树高。
 
+## 哈希表
+### XXHash
+可参考 https://create.stephan-brumme.com/xxhash/ \
+xxHash was designed from the ground up to be as fast as possible on modern CPUs.
+It is not a strong cryptographic hash, such as the SHA family, but still passes the SMHasher test set with 10 points.
+
+Most simple hashes, such as FNV (see my posting, too), step through the input data byte-by-byte.
+Working on byte at position 1 requires that all work on the previous byte (at position 0) has finished.
+Therefore, we have a dependency which causes the CPU to potentially wait (stalling).
+
+Slightly better algorithms process a block of bytes at once, e.g. CRC Slicing-by-4/8/16 consumes 4/8/16 bytes per step - instead just one - giving a substantial speed-up.
+However, we still have the same problem: working on block 1 requires that all work on block 0 has finished.
+
+xxHash subdivides input data into four independent streams. Each stream processes a block of 4 bytes per step and stores a temporary state.
+Only the final step combines these four states into a single one.
+
+The major advantage is that the code generator has lots of opportunities to re-order opcodes to avoid latencies.
+
 # 操作系统
 ## 基本概念
 ### 进程与线程
