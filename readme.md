@@ -587,6 +587,17 @@ The load factor influences the probability of collision in the hash table (i.e.,
 
 Note though, that implementations may impose an upper limit on the number of buckets (see max_bucket_count), which may force the container to ignore the max_load_factor.
 
+#### void reserve(size_type n)
+详见 http://www.cplusplus.com/reference/unordered_map/unordered_map/reserve/ \
+设置哈希桶个数\
+Sets the number of buckets in the container (bucket_count) to the most appropriate to contain at least n elements.
+
+If n is greater than the current bucket_count multiplied by the max_load_factor, the container's bucket_count is increased and a rehash is forced.
+
+If n is lower than that, the function may have no effect.
+
+By calling reserve with the size we expected for the unordered_map container we avoided the multiple rehashes that the increases in container size could have produced and optimized the size of the hash table.
+
 ### vector
 #### emplace_back()
 类似于push_back函数，但不同，在vector后方创建一个与参数相同的元素，而push_back是将参数的引用推入后方。
