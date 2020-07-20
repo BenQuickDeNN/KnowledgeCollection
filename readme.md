@@ -1351,3 +1351,5 @@ SSA 形式的 IR 主要特征是每个变量只赋值一次。相比而言，非
 
 #### LLVM Instruction
 ![llvm_instruction_1](image/llvm_instruction_1.png)
+
+# 设计模式（Design Pattern）
