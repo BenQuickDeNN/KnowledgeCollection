@@ -858,6 +858,96 @@ Only the final step combines these four states into a single one.
 
 The major advantage is that the code generator has lots of opportunities to re-order opcodes to avoid latencies.
 
+## 大数据过滤器
+### Bitmap过滤器
+#### 适用场景
+例：给40亿个**不重复**的无符号整数，没排过序。给一个无符号整数，如何快速判断一个数是否在这40亿个数中。
+
+#### 思路
+创建一片内存，用这片内存的第i位表示数字i是否存在，若第i位为1则表示数字i存在，否则数字i不存在。如果有40亿个不重复数字，那么大概需要500M内存。
+
+#### 示例代码
+```c++
+typedef unsigned char byte;
+
+class BitmapFilter
+{
+public:
+    BitmapFilter(const size_t &_size = 0)
+    {
+        resize(_size);
+    }
+    void resize(const size_t &_size = 0)
+    {
+        this->_size = _size;
+        datas.resize(_size / _size_w + 1, 0);
+        cout << "allocate " << datas.size() * sizeof(byte) << " bytes" << endl;
+    }
+    void insert(const size_t &x)
+    {
+        // 检查x是不是大于_size
+        if (x > _size)
+        {
+            cerr << "insert error: x > _size" << endl;
+            return;
+        }
+        // 插入
+        datas[x / _size_w] |= (1 << (x % _size_w));
+    }
+    void remove(const size_t &x)
+    {
+        if (x > _size)
+        {
+            cerr << "reset error: x > _size" << endl;
+            return;
+        }
+        // 删除
+        datas[x / _size_w] &= ~(1 << (x % _size_w));
+    }
+    bool find(const size_t &x)
+    {
+        if (x > _size)
+        {
+            cerr << "check error: x > _size" << endl;
+            return false;
+        }
+        return datas[x / _size_w] &= (1 << (x % _size_w));
+    }
+
+private:
+    vector<byte> datas;
+    size_t _size;
+    size_t _size_w = sizeof(byte) * 8;
+};
+```
+
+### 布隆（Bloom）过滤器
+#### 适用场景
+如主从分布：一个数组过来，我想要知道他是不是在内存中，我们是不是需要一个一个去访问磁盘，判断数据是否存在。但是问题来了访问磁盘的速度是很慢的，所以效率会很低，如果使用布隆过滤器，我们就可以先去过滤器这个集合里面找一下对应的位置的数据是否存在。虽然布隆过滤器有他的缺陷，但是我们能够知道的是当前位置为0是肯定不存在的，如果都不存在，就不需要去访问了。
+
+#### 原理
+如果想判断一个元素是不是在一个集合里，一般想到的是将集合中所有元素保存起来，然后通过比较确定。链表、树、散列表（又叫哈希表，Hash table）等等数据结构都是这种思路。但是随着集合中元素的增加，我们需要的存储空间越来越大。同时检索速度也越来越慢。
+
+Bloom Filter 是一种空间效率很高的随机数据结构，Bloom filter 可以看做是对 bit-map 的扩展, 它的原理是：
+
+当一个元素被加入集合时，通过 K 个 Hash函数将这个元素映射成一个位阵列（Bit array）中的 K 个点，把它们置为 1。检索时，我们只要看看这些点是不是都是 1 就（大约）知道集合中有没有它了：
+* 如果这些点有任何一个 0，则被检索元素**一定不存在**
+* 如果都是1，则被检索元素**可能存在**，不能判定一定存在。因为不同的哈希函数可能映射到相同的位置上，所以不同的输入值可能对应相同的key序列，造成误算。随着问题规模的增大，误算率会升高。
+
+插入流程图：
+```mermaid
+graph TB;
+    0(start) --> 1;
+    1[insert v] --> 2.1[hash1 v = bit1];
+    1 --> 2.2[hash2 v = bit2];
+    1 --> 2.3[...];
+    1 --> 2.4[hashK v = bitn];
+    2.1 --> 3.1[set bit1=1];
+    2.2 --> 3.2[set bit2=1];
+    2.3 --> 3.3[...];
+    2.4 --> 3.4[set bitn=1];
+```
+
 # 操作系统
 ## 基本概念
 ### 进程与线程
