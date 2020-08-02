@@ -619,6 +619,23 @@ By calling reserve with the size we expected for the unordered_map container we 
 copy(源首地址, 源末地址, 目标首地址);
 ```
 
+### priority_queue
+优先级队列，可实现堆排序
+#### 用法示例
+```c++
+#include <queue>
+std::priority_queue<Type, Container, Func>
+```
+大顶堆：
+```c++
+priority_queue<int, vector<int>> heap1; // 默认大顶堆，最大的元素先出队
+priority_queue<int, vector<int>, less<int>> heap1b;
+```
+小顶堆
+```c++
+priority_queue<int, vector<int>, greater<int>> heap2;
+```
+
 ## C++11新特性
 ### 智能指针
 #### 基本特性
