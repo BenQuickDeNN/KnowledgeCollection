@@ -861,8 +861,112 @@ int main()
 }
 ```
 
-### 字典树（Trie树）
+## 字典树（Trie树）
 又称“前缀树”、“Trie树”，是一种哈希树的变种。典型应用是用于统计，排序和保存大量的字符串（但不仅限于字符串），所以经常被搜索引擎系统用于文本词频统计。它的优点是：利用字符串的公共前缀来减少查询时间，最大限度地减少无谓的字符串比较，查询效率比哈希树高。
+
+## 最长公共子序列（Longest Common Sub-sequence, LCS）
+可参考 https://zhuanlan.zhihu.com/p/47591838 \
+动态规划递推式：
+```c++
+// 计算出字符串str_a、str_b的最长公共子序列长度
+string str_a, str_b;
+// 初始化
+L[0:I][0] = 0; L[0][0:J] = 0;
+// 递推
+for (size_t i = 1; i < I; i++)
+    for (size_t j = 1; j < J; j++)
+    {
+        
+        L[i][j] = max(L[i-1][j], L[i][j-1]);
+        if (str_a[i] == str_b[j])
+            L[i][j] = max(L[i][j], L[i-1][j-1] + 1);
+    }
+return L[I-1][J-1];
+```
+
+## 检验一个整数是否是回文数
+```c++
+bool isReverse(const int& x)
+{
+    int tmp = 0, xs = x;
+    while (x)
+    {
+        tmp = tmp * 10 + x % 10;
+        x = x / 10;
+    }
+    return xs == tmp;
+}
+```
+## 检验一个整数是否是素数
+```c++
+bool isPrime(const int& x)
+{
+    if (x == 0 || x == 1) return false;
+    for (int i = 2; i <= x / 2; i++)
+        if (x % i == 0)
+            return false;
+    return true;
+}
+```
+
+## 马拉车算法（Manacher Algorithm）
+### 适用场景
+求一个字符串中最长回文子串
+
+### 示例代码
+参考 https://zhuanlan.zhihu.com/p/70532099 \
+```c++
+string str; // 输入的字符串
+// 预处理，在字符串前方和后方插入#，每个字符之间插入#;字符串最前方插入^，字符串最后插入$
+string preProcess(const string &str)
+{
+    const int n = str.size();
+    if (n == 0) return "^$";
+    string ret = "^";
+    for (int i = 0; i < n; i++)
+        ret += '#' + str[i];
+    ret += "#$";
+    return ret;
+}
+
+// 马拉车算法
+string longestPalindrome(const string &str)
+{
+    string T = preProcess(str);
+    const int n = T.size();
+    int *P = new int[n];
+    int C = 0, R = 0;
+    for (int i = 1; i < n - 1; i++)
+    {
+        int i_mirror = 2 * C - i;
+        if (R > i)
+            P[i] = min(R - i, P[i_mirror]); // 防止超出R
+        else
+            P[i] = 0;   // 等于R的情况
+        // 碰到之前讲的三种情况，要用中心扩展法
+        while (T[i + 1 + P[i]] == T[i - 1 - P[i]])
+            ++P[i];
+        // 判断是否需要更新R
+        if (i + P[i] > R)
+        {
+            C = i;
+            R = i + P[i];
+        }
+    }
+    // 找出P的最大值
+    int maxLen = 0;
+    int centerIdx = 0;
+    for (int i = 1; i < n - 1; i++)
+        if (P[i] > maxLen)
+        {
+            maxLen = P[i];
+            centerIdx = i;
+        }
+    delete[] p;
+    int start = (centerIdx - maxLen) / 2; // 最开始讲的求原字符串下标
+    return str.substring(start, start + maxLen);
+}
+```
 
 ## 哈希表
 ### XXHash
