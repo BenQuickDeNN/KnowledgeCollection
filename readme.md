@@ -609,6 +609,11 @@ By calling reserve with the size we expected for the unordered_map container we 
 #### emplace_back()
 类似于push_back函数，但不同，在vector后方创建一个与参数相同的元素，而push_back是将参数的引用推入后方。
 
+#### reserve()
+vector 的reserve增加了vector的capacity，但是它的size没有改变！而resize改变了vector的capacity同时也增加了它的size。
+
+ reserve是容器预留空间，但在空间内不真正创建元素对象，所以在没有添加新的对象之前，不能引用容器内的元素。加入新的元素时，要调用push_back()/insert()函数。
+
 ### copy()
 #### 头文件
 ```c++
