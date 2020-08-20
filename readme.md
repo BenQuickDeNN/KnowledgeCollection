@@ -649,7 +649,7 @@ priority_queue<int, vector<int>, greater<int>> heap2;
 
 #### unique_ptr\<T>
 ##### 分配内存
-与shared_ptr不同，C++11标准中unique_ptr没有定义类似make_shared的操作（C++14中有make_unique\<T>()），因此只可以使用new来分配内存，并且由于unique_ptr不可拷贝和赋值，初始化unique_ptr必须使用直接初始化的方式。
+与shared_ptr不同，C++11标准中unique_ptr没有定义类似make_shared的操作（C++14中有make_unique\<T\>()），因此只可以使用new来分配内存，并且由于unique_ptr不可拷贝和赋值，初始化unique_ptr必须使用直接初始化的方式。
 ```c++
 unique_ptr<int> up1(new int());    //okay,直接初始化
 unique_ptr<int> up2 = new int();   //error! 构造函数是explicit
@@ -723,6 +723,17 @@ d
 ### default constructors
 详见[CppRef](https://en.cppreference.com/w/cpp/language/default_constructor)\
 A default constructor is a constructor which can be called with no arguments (either defined with an empty parameter list, or with default arguments provided for every parameter). A type with a public default constructor is DefaultConstructible.
+
+### noexcept
+参考 https://www.cnblogs.com/sword03/p/10020344.html
+
+从C++11开始，我们能看到很多代码当中都有关键字noexcept。比如下面就是std::initializer_list的默认构造函数，其中使用了noexcept。
+```c++
+constexpr initializer_list() noexcept
+    : _M_array(0), _M_len(0) { }
+```
+该关键字告诉编译器，函数中不会发生异常,这有利于编译器对程序做更多的优化。
+如果在运行时，noexecpt函数向外抛出了异常（如果函数内部捕捉了异常并完成处理，这种情况不算抛出异常），程序会直接终止，调用std::terminate()函数，该函数内部会调用std::abort()终止程序。
 
 # 高性能计算
 ## 并行数值算法
