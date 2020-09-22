@@ -67,9 +67,6 @@ public class Reptilia {
 ### 模板特化
 指明模板中的类型，使模板函数对某种类型特例化。例如下面的全特化例子中，普通的cmp模板函数比较t1和t2的大小，但当t1、t2的类型为```char*```时运算符“==”比较的是它们的首地址。所以为了比较```char*```类型需要对```char*```类型进行特化。
 
-### 单例
-
-
 #### 全特化
 ```c++
 #include <iostream>
@@ -199,6 +196,53 @@ const修饰运行时常量；constptr修饰编译期常量，修饰的对象在�
 ### 虚函数
 * 虚函数不是类的成员函数。
 * 虚函数一般用来定义类接口，告诉程序员要在子类中实现这些接口。
+
+#### 纯虚函数
+纯虚函数是一种特殊的虚函数，在许多情况下，在基类中不能对虚函数给出有意义的实现，而把它声明为纯虚函数，它的实现留给该基类的派生类去做。这就是纯虚函数的作用。\
+纯虚函数也可以叫抽象函数，一般来说它只有函数名、参数和返回值类型，不需要函数体。这意味着它没有函数的实现，需要让派生类去实现。\
+C++中的纯虚函数，一般在函数签名后使用=0作为此类函数的标志。Java、C#等语言中，则直接使用abstract作为关键字修饰这个函数签名，表示这是抽象函数(纯虚函数)。
+
+示例：
+```c++
+class <类名>
+{
+virtual <类型><函数名>(<参数表>)=0;
+…
+};
+```
+基类：
+```c++
+class A {
+public:
+    A();
+    virtual ~A();
+    void f1();
+    virtual void f2();
+    virtual void f3()=0;
+};
+```
+子类：
+```c++
+class B:public A{
+public:
+    B();
+    virtual ~B();
+    void f1();
+    virtual void f2();
+    virtual void f3();
+};
+```
+主函数：
+```c++
+int main(int argc,char * argv[]) {
+    A *m_j = new B();
+    m_j -> f1();
+    m_j -> f2();
+    m_j -> f3();
+    delete m_j;
+    return 0;
+}
+```
 
 ### 浅拷贝和深拷贝
 浅拷贝与深拷贝的区别可见[CSDN博客](https://www.cnblogs.com/wjcoding/p/10955017.html)。
@@ -1521,8 +1565,8 @@ SSA 形式的 IR 主要特征是每个变量只赋值一次。相比而言，非
 #### LLVM Instruction
 ![llvm_instruction_1](image/llvm_instruction_1.png)
 
-# 设计模式（Design Pattern）
-## 简介
+# 软件工程
+## 设计模式（Design Pattern）
 ### 四人帮（Gang of Four, GOF）
 在 1994 年，由 Erich Gamma、Richard Helm、Ralph Johnson 和 John Vlissides 四人合著出版了一本名为 Design Patterns - Elements of Reusable Object-Oriented Software（中文译名：设计模式 - 可复用的面向对象软件元素） 的书，该书首次提到了软件开发中设计模式的概念。\
 GOF提出的面向对象设计原则
@@ -1595,6 +1639,51 @@ GOF提出的面向对象设计原则
 
 #### 合成复用原则（Composite Reuse Principle）
 合成复用原则是指：尽量使用合成/聚合的方式，而不是使用继承。
+
+## 单例
+单例模式（Singleton Pattern）是 Java 中最简单的设计模式之一。这种类型的设计模式属于创建型模式，它提供了一种创建对象的最佳方式。这种模式涉及到一个单一的类，该类负责创建自己的对象，同时确保只有单个对象被创建。这个类提供了一种访问其唯一的对象的方式，可以直接访问，不需要实例化该类的对象。\
+示例（Java）：
+1. 创建一个 Singleton 类。
+```java
+public class SingleObject {
+ 
+   //创建 SingleObject 的一个对象
+   private static SingleObject instance = new SingleObject();
+ 
+   //让构造函数为 private，这样该类就不会被实例化
+   private SingleObject(){}
+ 
+   //获取唯一可用的对象
+   public static SingleObject getInstance(){
+      return instance;
+   }
+ 
+   public void showMessage(){
+      System.out.println("Hello World!");
+   }
+}
+```
+2. 从 singleton 类获取唯一的对象。
+```java
+public class SingletonPatternDemo {
+   public static void main(String[] args) {
+ 
+      //不合法的构造函数
+      //编译时错误：构造函数 SingleObject() 是不可见的
+      //SingleObject object = new SingleObject();
+ 
+      //获取唯一可用的对象
+      SingleObject object = SingleObject.getInstance();
+ 
+      //显示消息
+      object.showMessage();
+   }
+}
+```
+3. 执行程序，输出结果：
+```
+Hello World!
+```
 
 # 测试开发
 ## 白盒、黑盒测试
