@@ -694,6 +694,32 @@ priority_queue<int, vector<int>, less<int>> heap1b;
 priority_queue<int, vector<int>, greater<int>> heap2;
 ```
 
+## C++特性
+### lower_bound、upper_bound与binary_bound函数
+头文件： #include  <algorithm>
+
+二分查找的函数有 3 个： 
+
+lower_bound(起始地址，结束地址，要查找的数值) 返回的是数值 第一个 出现的位置。
+
+upper_bound(起始地址，结束地址，要查找的数值) 返回的是 第一个大于待查找数值 出现的位置。
+
+binary_search(起始地址，结束地址，要查找的数值)  返回的是是否存在这么一个数，是一个bool值。
+
+注意：使用二分查找的前提是数组有序。
+
+#### 函数lower_bound()
+参考：https://www.cnblogs.com/is-Tina/p/7294067.html
+
+功能：函数lower_bound()在first和last中的前闭后开区间进行二分查找，返回大于或等于val的第一个元素位置。如果所有元素都小于val，则返回last的位置.
+
+注意：如果所有元素都小于val，则返回last的位置，且last的位置是越界的！！
+
+#### 函数upper_bound()
+功能：函数upper_bound()返回的在前闭后开区间查找的关键字的上界，返回大于val的第一个元素位置
+
+注意：返回查找元素的最后一个可安插位置，也就是“元素值>查找值”的第一个元素的位置。同样，如果val大于数组中全部元素，返回的是last。(注意：数组下标越界)
+
 ## C++11新特性
 ### 左引用
 左引用是C++11中的新特性，创建一个“引用型变量”（有点像创建指针）
